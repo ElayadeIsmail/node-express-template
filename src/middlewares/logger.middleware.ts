@@ -1,8 +1,8 @@
+import { envVars } from '@/config';
 import { Response } from 'express';
 import fs from 'fs';
 import morgan from 'morgan';
 import path from 'path';
-import { envVars } from '../config';
 
 morgan.token('message', (_, res: Response) => res.locals.errorMessage || '');
 
