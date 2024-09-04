@@ -1,5 +1,5 @@
+import loggerMiddleware from '@/middlewares/logger.middleware';
 import express from 'express';
-import loggerMiddleware from './middlewares/logger.middleware';
 
 const app = express();
 
