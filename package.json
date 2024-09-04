@@ -11,7 +11,9 @@
     "lint": "eslint \"src/**/*.{js,ts,jsx,tsx}\"",
     "lint:fix": "eslint \"src/**/*.{js,ts,jsx,tsx}\" --fix",
     "start": "ts-node src/index.ts",
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts"
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "db:generate": "npx drizzle-kit generate",
+    "db:migrate": "npx drizzle-kit migrate"
   },
   "husky": {
     "hooks": {
@@ -43,6 +45,7 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
+    "@paralleldrive/cuid2": "^2.2.2",
     "better-sqlite3": "^11.2.1",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.33.0",
