@@ -2,7 +2,7 @@ import { defineConfig } from 'drizzle-kit';
 import { envVars } from './src/config';
 
 export default defineConfig({
-  schema: './src/schemas/**/*.{ts,js}',
+  schema: './src/database/schemas/**/*.{ts,js}',
   dbCredentials: {
     url: envVars.dbUrl,
   },
