@@ -1,30 +1,35 @@
-import { envVars } from '@/config';
-import { Response } from 'express';
-import fs from 'fs';
-import morgan from 'morgan';
-import path from 'path';
+import { logger } from '@/config';
+import { randomUUID } from 'crypto';
+import { Request, Response } from 'express';
+import PinoHttp from 'pino-http';
 
-morgan.token('message', (_, res: Response) => res.locals.errorMessage || '');
+export const loggerMiddleware = PinoHttp({
+  logger,
+  quietReqLogger: true,
+  quietResLogger: true,
+  genReqId: () => randomUUID(),
+  customLevels: (_req: Request, res: Response, err: unknown) => {
+    if (res.statusCode >= 400 && res.statusCode < 500) {
+      return 'warn';
+    } else if (res.statusCode >= 500 || err) {
+      return 'error';
+    } else if (res.statusCode >= 300 && res.statusCode < 400) {
+      return 'silent';
+    }
+    return 'info';
+  },
 
-const getIPFormat = () =>
-  envVars.env === 'production' ? ':remote-addr - ' : '';
+  customSuccessMessage: (_req: Request, res: Response, responseTime) => {
+    return `Method: ${res.req.method}, ${res.req.path} Status: ${res.statusCode}, IP: ${res.req.headers['x-forwarded-for'] || res.req.socket.remoteAddress} Time: ${responseTime}ms`;
+  },
 
-const accessLogStream = fs.createWriteStream(
-  path.join(process.cwd(), 'logs/access.log'),
-  { flags: 'a' }
-);
+  // Define a custom receive message
+  customReceivedMessage: function (req, _res) {
+    return `Request received:  ${req.method} ${req.path}`;
+  },
 
-const successResponseFormat = `${getIPFormat()} :method :url :status :response-time ms :user-agent :date`;
-
-const successHandler = morgan(successResponseFormat, {
-  stream: envVars.env === 'production' ? accessLogStream : process.stdout,
-  skip: (_, res) => res.statusCode >= 400,
+  // Define a custom error message
+  customErrorMessage: function (req, res, err) {
+    return `Request errored with status code:  ${res.statusCode} ${req.path}  err: ${err}`;
+  },
 });
-
-const errorResponseFormat = `${getIPFormat()} :method :url :status :response-time ms :user-agent :date - error-message: :message`;
-const errorHandler = morgan(errorResponseFormat, {
-  stream: envVars.env === 'production' ? accessLogStream : process.stdout,
-  skip: (_, res) => res.statusCode < 400,
-});
-
-export default { errorHandler, successHandler };

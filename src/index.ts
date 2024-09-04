@@ -15,7 +15,7 @@ const exitHandler = () => {
   });
 };
 const unExpectedErrorHandler = (error: Error) => {
-  logger.error(error);
+  logger.fatal(error, 'unExpectedErrorHandler');
   exitHandler();
 };
 
