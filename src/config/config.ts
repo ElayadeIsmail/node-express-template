@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import { z } from 'zod';
+import { logger } from './logger';
 
 const envSchema = z.object({
   PORT: z.coerce.number({}).int().positive().default(3000),
@@ -12,7 +13,7 @@ const envSchema = z.object({
 const result = envSchema.safeParse(process.env);
 
 if (!result.success) {
-  console.error(`Invalid environment variables: ${result.error.issues}`);
+  logger.error(`Invalid environment variables: ${result.error.issues}`);
   process.exit(1);
 }
 
