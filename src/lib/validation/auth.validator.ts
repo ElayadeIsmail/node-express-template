@@ -8,6 +8,12 @@ const usernameSchema = z
     message: 'Username can only contain letters and underscores',
   });
 
+const emailSchema = z.string({ required_error: 'Email is required' }).email({
+  message: 'Email is not valid',
+});
+
+const emailOrUsernameSchema = z.union([emailSchema, usernameSchema]);
+
 const passwordSchema = z
   .string({ required_error: 'Password is required' })
   .regex(
@@ -19,9 +25,28 @@ const passwordSchema = z
   );
 
 export const loginSchema = z.object({
-  username: usernameSchema,
+  usernameOrEmail: emailOrUsernameSchema,
   password: passwordSchema,
   rememberMe: z.boolean().default(false),
 });
 
 export type LoginSchema = z.infer<typeof loginSchema>;
+
+export const registerSchema = z
+  .object({
+    username: usernameSchema,
+    email: emailSchema,
+    password: passwordSchema,
+    confirmPassword: z.string({
+      required_error: 'Confirm password is required',
+    }),
+    acceptTerms: z.boolean({
+      required_error: 'You must accept the terms and conditions',
+    }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
+
+export type RegisterSchema = z.infer<typeof registerSchema>;
