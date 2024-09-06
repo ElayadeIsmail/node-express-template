@@ -1,5 +1,5 @@
 import { app } from '@/app';
-import { envVars, logger } from '@/config';
+import { envVars, logger, redisClient } from '@/config';
 import http from 'http';
 
 const httpServer = http.createServer(app);
@@ -9,10 +9,20 @@ const server = httpServer.listen(envVars.port, () => {
 });
 
 const exitHandler = () => {
-  server.close(() => {
-    logger.info('Server closed');
-    process.exit(1);
-  });
+  redisClient
+    .quit()
+    .then(() => {
+      logger.info('Redis client disconnected');
+    })
+    .catch((err) => {
+      logger.error('Error disconnecting Redis client:', err);
+    })
+    .finally(() => {
+      server.close(() => {
+        logger.info('Server closed');
+        process.exit(1);
+      });
+    });
 };
 const unExpectedErrorHandler = (error: Error) => {
   logger.fatal(error, 'unExpectedErrorHandler');
@@ -23,5 +33,5 @@ process.on('uncaughtException', unExpectedErrorHandler);
 process.on('unhandledRejection', unExpectedErrorHandler);
 process.on('SIGTERM', () => {
   logger.info('Received SIGTERM. Shutting down..');
-  server.close();
+  exitHandler();
 });
