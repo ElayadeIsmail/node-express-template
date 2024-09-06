@@ -7,6 +7,8 @@ const envSchema = z.object({
   NODE_ENV: z
     .enum(['development', 'production', 'staging', 'test'])
     .default('development'),
+  REDIS_URL: z.string(),
+  SESSION_SECRET: z.string(),
 });
 
 const result = envSchema.safeParse(process.env);
@@ -20,4 +22,6 @@ export const envVars = {
   port: result.data.PORT,
   dbUrl: result.data.DB_URL,
   env: result.data.NODE_ENV,
+  redisUrl: result.data.REDIS_URL,
+  sessionSecret: result.data.SESSION_SECRET,
 };
