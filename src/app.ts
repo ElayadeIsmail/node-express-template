@@ -1,6 +1,10 @@
 import { envVars, redisClient } from '@/config';
 import { NotFoundError } from '@/errors';
-import { errorHandlerMiddleware, loggerMiddleware } from '@/middlewares';
+import {
+  currentUserMiddleware,
+  errorHandlerMiddleware,
+  loggerMiddleware,
+} from '@/middlewares';
 import { authRouter } from '@/router';
 import RedisStore from 'connect-redis';
 import express from 'express';
@@ -38,6 +42,7 @@ if (envVars.env === 'production') {
 }
 app.use(express.json());
 app.use(loggerMiddleware);
+app.use(currentUserMiddleware);
 
 app.get('/', (_, res) => {
   res.send('Hello world');
