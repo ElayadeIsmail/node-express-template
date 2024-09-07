@@ -13,4 +13,6 @@ router.post(
   authService.register
 );
 
+router.post('/logout', authService.logout);
+
 export { router as authRouter };
