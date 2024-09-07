@@ -1,11 +1,11 @@
 import { envVars, redisClient } from '@/config';
+import { NotFoundError } from '@/errors';
 import { errorHandlerMiddleware, loggerMiddleware } from '@/middlewares';
+import { authRouter } from '@/router';
 import RedisStore from 'connect-redis';
 import express from 'express';
 import 'express-async-errors';
 import session from 'express-session';
-import { NotFoundError } from './errors';
-import { authRouter } from './router';
 
 // Initialize store.
 const redisStore = new RedisStore({
@@ -21,9 +21,10 @@ app.use(
     store: redisStore,
     resave: false, // required: force lightweight session keep alive (touch)
     saveUninitialized: false, // recommended: only save session when data exists
-    secret: envVars.sessionSecret,
+    secret: envVars.sessionSecret.split(','),
+    name: 'sessionId',
     cookie: {
-      maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+      maxAge: envVars.sessionExpiresInMs, // 1 week
       httpOnly: true,
       secure: envVars.env === 'production',
       sameSite: 'strict',
