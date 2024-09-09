@@ -11,9 +11,9 @@ export class ValidationError extends CustomError {
   }
 
   serializeErrors() {
-    return this.zodIssues.map((_issue) => ({
-      message: _issue.message,
-      field: _issue.path.join('.'),
+    return this.zodIssues.map((issue) => ({
+      message: issue.message,
+      field: issue.path.join('.'),
     }));
   }
 }

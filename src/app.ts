@@ -50,7 +50,7 @@ app.get('/', (_, res) => {
 
 app.use('/auth', authRouter);
 
-app.all('*', async (_req, _res) => {
+app.all('*', async () => {
   throw new NotFoundError();
 });
 

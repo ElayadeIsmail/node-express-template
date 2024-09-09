@@ -24,7 +24,7 @@ export const loggerMiddleware = PinoHttp({
   },
 
   // Define a custom receive message
-  customReceivedMessage: function (req, _res) {
+  customReceivedMessage: function (req) {
     return `Request received:  ${req.method} ${req.path}`;
   },
 
